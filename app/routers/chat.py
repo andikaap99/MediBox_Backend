@@ -15,4 +15,5 @@ async def chat(request: ChatRequest):
     rag_context = retrieve_rag(request.message)
     slot_context = get_slot_context(request.user_id)
     response = await call_qwen(request.message, slot_context, rag_context)
+    
     return {"response": response}

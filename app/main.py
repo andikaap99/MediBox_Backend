@@ -6,4 +6,5 @@ app.include_router(chat_router)
 
 @app.get("/")
 def root():
+    
     return {"status": "MediBox AI is running"}

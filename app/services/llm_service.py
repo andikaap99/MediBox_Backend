@@ -36,4 +36,5 @@ Instruksi:
             timeout=30.0
         )
         data = response.json()
+        
         return data["choices"][0]["message"]["content"]

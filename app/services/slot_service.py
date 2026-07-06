@@ -11,6 +11,7 @@ def get_slot_context(user_id: str) -> str:
 
     slots = response.data
     if not slots:
+        
         return "Tidak ada data slot obat."
 
     lines = []

@@ -10,4 +10,5 @@ def retrieve_rag(query: str, top_k: int = 3) -> str:
     query_embedding = embed_model.get_text_embedding(query)
     results = collection.query(query_embeddings=[query_embedding], n_results=top_k)
     chunks = results["documents"][0] if results["documents"] else []
+    
     return "\n\n".join(chunks)
