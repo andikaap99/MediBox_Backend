@@ -53,6 +53,26 @@ def get_all_slots(user_id: str) -> list[dict]:
     return response.data or []
 
 
+def add_slot(user_id: str, slot_label: str, medicine_name: str = "") -> dict:
+    existing = supabase.table("slots") \
+        .select("id") \
+        .eq("user_id", user_id) \
+        .eq("slot_label", slot_label) \
+        .execute()
+
+    if existing.data:
+        raise ValueError(f"Slot {slot_label} sudah ada untuk user ini")
+
+    result = supabase.table("slots").insert({
+        "user_id": user_id,
+        "slot_label": slot_label,
+        "medicine_name": medicine_name,
+        "is_filled": False
+    }).execute()
+
+    return result.data[0]
+
+
 def update_slot_config(slot_id: str, medicine_name: str):
     supabase.table("slots") \
         .update({"medicine_name": medicine_name}) \

@@ -93,7 +93,8 @@ Mendaftarkan akun pengguna baru.
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "token_type": "bearer",
-  "user_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+  "user_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "full_name": "Budi Santoso"
 }
 ```
 
@@ -137,7 +138,8 @@ Melakukan autentikasi dan mendapatkan JWT token.
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "token_type": "bearer",
-  "user_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+  "user_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "full_name": "Budi Santoso"
 }
 ```
 
@@ -313,7 +315,66 @@ Mengambil semua slot obat beserta statusnya untuk pengguna tertentu.
 
 ---
 
-### 8. Configure Slot
+### 8. Add Slot
+
+Menambahkan slot obat baru ke kotak obat pengguna.
+
+| | |
+|---|---|
+| **Method** | `POST` |
+| **Endpoint** | `/slots/{user_id}` |
+| **Auth** | Tidak* |
+
+**Path Parameter**
+
+| Field | Tipe | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `user_id` | `string` | Ya | UUID pengguna |
+
+**Request Body**
+
+| Field | Tipe | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `slot_label` | `string` | Ya | Label slot (misal: `"A"`, `"B"`, `"C"`) |
+| `medicine_name` | `string` | Tidak | Nama obat (default: `""`) |
+
+```json
+{
+  "slot_label": "D",
+  "medicine_name": "Entrostop"
+}
+```
+
+**Response `200 OK`**
+
+```json
+{
+  "status": "ok",
+  "slot": {
+    "id": "slot-uuid-3",
+    "user_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "slot_label": "D",
+    "medicine_name": "Entrostop",
+    "is_filled": false
+  }
+}
+```
+
+**Response `400 Bad Request`**
+
+```json
+{
+  "detail": "Slot D sudah ada untuk user ini"
+}
+```
+
+**Catatan:**
+- Slot baru akan dibuat dengan status `is_filled: false` (kosong) secara default
+- `slot_label` harus unik per pengguna
+
+---
+
+### 9. Configure Slot
 
 Mengubah nama obat yang ditugaskan ke suatu slot.
 
@@ -348,6 +409,74 @@ Mengubah nama obat yang ditugaskan ke suatu slot.
   "status": "ok"
 }
 ```
+
+---
+
+### 10. Update Profile
+
+Memperbarui data profil pengguna (nama, email, atau password).
+
+| | |
+|---|---|
+| **Method** | `PUT` |
+| **Endpoint** | `/auth/profile/{user_id}` |
+| **Auth** | Tidak* |
+
+**Path Parameter**
+
+| Field | Tipe | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `user_id` | `string` | Ya | UUID pengguna |
+
+**Request Body**
+
+| Field | Tipe | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `full_name` | `string` | Tidak | Nama lengkap baru |
+| `email` | `string` | Tidak | Email baru (harus unik) |
+| `password` | `string` | Tidak | Password baru (akan di-hash) |
+
+```json
+{
+  "full_name": "Budi Santoso",
+  "email": "budi@example.com"
+}
+```
+
+**Response `200 OK`**
+
+```json
+{
+  "status": "ok"
+}
+```
+
+**Response `400 Bad Request`**
+
+```json
+{
+  "detail": "Email sudah digunakan oleh pengguna lain"
+}
+```
+
+```json
+{
+  "detail": "Tidak ada data yang diperbarui"
+}
+```
+
+**Response `404 Not Found`**
+
+```json
+{
+  "detail": "User tidak ditemukan"
+}
+```
+
+**Catatan:**
+- Semua field bersifat opsional, kirim hanya yang ingin diubah
+- Jika mengubah email, sistem akan mengecek keunikannya
+- Jika mengubah password, password akan di-hash ulang dengan bcrypt
 
 ---
 
