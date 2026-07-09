@@ -158,7 +158,12 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Spesification Files
 chromadb/
+RAG/
+private/
+
 
 # Spyder project settings
 .spyderproject

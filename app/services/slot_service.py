@@ -3,6 +3,27 @@ from app.core.config import SUPABASE_URL, SUPABASE_KEY
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+
+def save_chat_history(user_id: str, user_message: str, bot_response: str):
+    supabase.table("chat_sessions").insert({
+        "user_id": user_id,
+        "user_message": user_message,
+        "bot_response": bot_response
+    }).execute()
+
+
+def get_chat_history(user_id: str, limit: int = 10) -> list[dict]:
+    response = supabase.table("chat_sessions") \
+        .select("user_message, bot_response") \
+        .eq("user_id", user_id) \
+        .order("id", desc=True) \
+        .limit(limit) \
+        .execute()
+
+    rows = response.data or []
+    return list(reversed(rows))
+
+
 def get_slot_context(user_id: str) -> str:
     response = supabase.table("slots") \
         .select("slot_label, medicine_name, is_filled") \
@@ -11,7 +32,7 @@ def get_slot_context(user_id: str) -> str:
 
     slots = response.data
     if not slots:
-        
+
         return "Tidak ada data slot obat."
 
     lines = []
@@ -20,3 +41,20 @@ def get_slot_context(user_id: str) -> str:
         lines.append(f"- Slot {slot['slot_label']}: {slot['medicine_name']} ({status})")
 
     return "\n".join(lines)
+
+
+def get_all_slots(user_id: str) -> list[dict]:
+    response = supabase.table("slots") \
+        .select("id, slot_label, medicine_name, is_filled") \
+        .eq("user_id", user_id) \
+        .order("slot_label") \
+        .execute()
+
+    return response.data or []
+
+
+def update_slot_config(slot_id: str, medicine_name: str):
+    supabase.table("slots") \
+        .update({"medicine_name": medicine_name}) \
+        .eq("id", slot_id) \
+        .execute()

@@ -8,3 +8,5 @@ llama-index-vector-stores-chroma
 llama-index-embeddings-huggingface
 supabase
 httpx
+python-jose[cryptography]
+bcrypt
