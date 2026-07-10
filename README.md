@@ -32,7 +32,7 @@ uvicorn app.main:app --reload
 ## Base URL
 
 ```
-http://localhost:8000
+https://medibox.rutherweb.my.id/
 ```
 
 Semua endpoint mengembalikan response dalam format **JSON** dengan `Content-Type: application/json`.
@@ -480,6 +480,122 @@ Memperbarui data profil pengguna (nama, email, atau password).
 
 ---
 
+### 11. Get Device
+
+Mengambil data perangkat ESP32 (berdasarkan MAC address) yang terdaftar milik pengguna. Satu akun hanya bisa memiliki satu perangkat.
+
+| | |
+|---|---|
+| **Method** | `GET` |
+| **Endpoint** | `/devices/{user_id}` |
+| **Auth** | Tidak* |
+
+**Path Parameter**
+
+| Field | Tipe | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `user_id` | `string` | Ya | UUID pengguna |
+
+**Response `200 OK` (ada device)**
+
+```json
+{
+  "device": {
+    "id": "device-uuid-1",
+    "mac_address": "AA:BB:CC:DD:EE:FF",
+    "device_name": "MediBox Ruang Tamu",
+    "created_at": "2026-07-10T12:00:00Z"
+  }
+}
+```
+
+**Response `200 OK` (belum ada device)**
+
+```json
+{
+  "device": null
+}
+```
+
+---
+
+### 12. Register / Update Device
+
+Mendaftarkan atau memperbarui perangkat ESP32 milik pengguna. Jika pengguna belum memiliki perangkat, maka akan ditambahkan. Jika sudah ada, maka akan diganti (upsert). Satu akun hanya bisa memiliki satu perangkat.
+
+| | |
+|---|---|
+| **Method** | `POST` |
+| **Endpoint** | `/devices/{user_id}` |
+| **Auth** | Tidak* |
+
+**Path Parameter**
+
+| Field | Tipe | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `user_id` | `string` | Ya | UUID pengguna |
+
+**Request Body**
+
+| Field | Tipe | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `mac_address` | `string` | Ya | MAC address perangkat ESP32 |
+| `device_name` | `string` | Tidak | Nama/label perangkat (default: `""`) |
+
+```json
+{
+  "mac_address": "AA:BB:CC:DD:EE:FF",
+  "device_name": "MediBox Ruang Tamu"
+}
+```
+
+**Response `200 OK`**
+
+```json
+{
+  "status": "ok",
+  "device": {
+    "id": "device-uuid-1",
+    "user_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "mac_address": "AA:BB:CC:DD:EE:FF",
+    "device_name": "MediBox Ruang Tamu",
+    "created_at": "2026-07-10T12:00:00Z"
+  }
+}
+```
+
+**Catatan:**
+- MAC address akan dinormalisasi ke huruf besar sebelum disimpan
+- Jika pengguna sudah memiliki perangkat, data lama akan diganti dengan yang baru
+
+---
+
+### 13. Delete Device
+
+Menghapus perangkat ESP32 milik pengguna.
+
+| | |
+|---|---|
+| **Method** | `DELETE` |
+| **Endpoint** | `/devices/{user_id}` |
+| **Auth** | Tidak* |
+
+**Path Parameter**
+
+| Field | Tipe | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `user_id` | `string` | Ya | UUID pengguna |
+
+**Response `200 OK`**
+
+```json
+{
+  "status": "ok"
+}
+```
+
+---
+
 ## Struktur Database
 
 ### Tabel `users`
@@ -521,6 +637,16 @@ Memperbarui data profil pengguna (nama, email, atau password).
 | `user_message` | `text` | Pesan dari pengguna |
 | `bot_response` | `text` | Respons dari chatbot |
 | `created_at` | `timestamptz` | Waktu pesan |
+
+### Tabel `devices`
+
+| Kolom | Tipe | Keterangan |
+|-------|------|------------|
+| `id` | `uuid` | Primary key |
+| `user_id` | `uuid` | Foreign key → `users.id` |
+| `mac_address` | `text` | MAC address unik perangkat ESP32 |
+| `device_name` | `text` | Nama/label perangkat |
+| `created_at` | `timestamptz` | Waktu pendaftaran |
 
 ---
 
