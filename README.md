@@ -243,13 +243,13 @@ Endpoint untuk menerima data dari sensor ESP32 pada kotak obat pintar. Sensor me
 
 | Field | Tipe | Wajib | Keterangan |
 |-------|------|-------|------------|
-| `user_id` | `string` | Ya | UUID pengguna pemilik kotak obat |
+| `mac_address` | `string` | Ya | Alamat MAC perangkat ESP32 |
 | `slot_label` | `string` | Ya | Label slot (misal: `"A"`, `"B"`, `"C"`) |
 | `is_filled` | `boolean` | Ya | `true` = terisi obat, `false` = kosong |
 
 ```json
 {
-  "user_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "mac_address": "AA:BB:CC:DD:EE:FF",
   "slot_label": "A",
   "is_filled": true
 }
