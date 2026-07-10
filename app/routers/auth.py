@@ -70,6 +70,8 @@ class UpdateProfileRequest(BaseModel):
     full_name: str | None = None
     email: str | None = None
     password: str | None = None
+    mac_address: str | None = None
+    device_name: str | None = None
 
 @router.put("/auth/profile/{user_id}")
 async def update_profile(user_id: str, request: UpdateProfileRequest):
@@ -100,6 +102,10 @@ async def update_profile(user_id: str, request: UpdateProfileRequest):
         updates["email"] = request.email
     if request.password is not None and request.password != "":
         updates["password"] = hash_password(request.password)
+    if request.mac_address is not None and request.mac_address != "":
+        updates["mac_address"] = request.mac_address.upper().strip()
+    if request.device_name is not None and request.device_name != "":
+        updates["device_name"] = request.device_name
 
     if not updates:
         raise HTTPException(
@@ -110,7 +116,7 @@ async def update_profile(user_id: str, request: UpdateProfileRequest):
     supabase.table("users").update(updates).eq("id", user_id).execute()
 
     updated = supabase.table("users") \
-        .select("id, email, full_name") \
+        .select("id, email, full_name, mac_address, device_name") \
         .eq("id", user_id) \
         .execute()
 

@@ -480,28 +480,28 @@ Memperbarui data profil pengguna (nama, email, atau password).
 
 ---
 
-### 11. Get Device
+### 11. Get Device by MAC Address
 
-Mengambil data perangkat ESP32 (berdasarkan MAC address) yang terdaftar milik pengguna. Satu akun hanya bisa memiliki satu perangkat.
+Mengambil data perangkat ESP32 berdasarkan MAC address. Berguna saat pengguna tidak mengetahui `user_id` tetapi mengetahui MAC address perangkatnya.
 
 | | |
 |---|---|
 | **Method** | `GET` |
-| **Endpoint** | `/devices/{user_id}` |
+| **Endpoint** | `/device/{mac_address}` |
 | **Auth** | Tidak* |
 
 **Path Parameter**
 
 | Field | Tipe | Wajib | Keterangan |
 |-------|------|-------|------------|
-| `user_id` | `string` | Ya | UUID pengguna |
+| `mac_address` | `string` | Ya | MAC address perangkat ESP32 |
 
 **Response `200 OK` (ada device)**
 
 ```json
 {
   "device": {
-    "id": "device-uuid-1",
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
     "mac_address": "AA:BB:CC:DD:EE:FF",
     "device_name": "MediBox Ruang Tamu",
     "created_at": "2026-07-10T12:00:00Z"
@@ -521,29 +521,25 @@ Mengambil data perangkat ESP32 (berdasarkan MAC address) yang terdaftar milik pe
 
 ### 12. Register / Update Device
 
-Mendaftarkan atau memperbarui perangkat ESP32 milik pengguna. Jika pengguna belum memiliki perangkat, maka akan ditambahkan. Jika sudah ada, maka akan diganti (upsert). Satu akun hanya bisa memiliki satu perangkat.
+Mendaftarkan atau memperbarui perangkat ESP32 milik pengguna. MAC address disimpan langsung di tabel `users`, sehingga satu akun otomatis hanya bisa memiliki satu perangkat.
 
 | | |
 |---|---|
 | **Method** | `POST` |
-| **Endpoint** | `/devices/{user_id}` |
+| **Endpoint** | `/device` |
 | **Auth** | Tidak* |
-
-**Path Parameter**
-
-| Field | Tipe | Wajib | Keterangan |
-|-------|------|-------|------------|
-| `user_id` | `string` | Ya | UUID pengguna |
 
 **Request Body**
 
 | Field | Tipe | Wajib | Keterangan |
 |-------|------|-------|------------|
+| `user_id` | `string` | Ya | UUID pengguna pemilik perangkat |
 | `mac_address` | `string` | Ya | MAC address perangkat ESP32 |
 | `device_name` | `string` | Tidak | Nama/label perangkat (default: `""`) |
 
 ```json
 {
+  "user_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "mac_address": "AA:BB:CC:DD:EE:FF",
   "device_name": "MediBox Ruang Tamu"
 }
@@ -555,8 +551,7 @@ Mendaftarkan atau memperbarui perangkat ESP32 milik pengguna. Jika pengguna belu
 {
   "status": "ok",
   "device": {
-    "id": "device-uuid-1",
-    "user_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
     "mac_address": "AA:BB:CC:DD:EE:FF",
     "device_name": "MediBox Ruang Tamu",
     "created_at": "2026-07-10T12:00:00Z"
@@ -566,25 +561,26 @@ Mendaftarkan atau memperbarui perangkat ESP32 milik pengguna. Jika pengguna belu
 
 **Catatan:**
 - MAC address akan dinormalisasi ke huruf besar sebelum disimpan
-- Jika pengguna sudah memiliki perangkat, data lama akan diganti dengan yang baru
+- Data device tersimpan langsung di tabel `users`, cukup update kolom `mac_address` dan `device_name`
+- `user_id` dapat diperoleh dari endpoint GET `/device/{mac_address}` atau dari response login
 
 ---
 
 ### 13. Delete Device
 
-Menghapus perangkat ESP32 milik pengguna.
+Menghapus perangkat ESP32 milik pengguna berdasarkan MAC address.
 
 | | |
 |---|---|
 | **Method** | `DELETE` |
-| **Endpoint** | `/devices/{user_id}` |
+| **Endpoint** | `/device/{mac_address}` |
 | **Auth** | Tidak* |
 
 **Path Parameter**
 
 | Field | Tipe | Wajib | Keterangan |
 |-------|------|-------|------------|
-| `user_id` | `string` | Ya | UUID pengguna |
+| `mac_address` | `string` | Ya | MAC address perangkat ESP32 |
 
 **Response `200 OK`**
 
@@ -606,6 +602,8 @@ Menghapus perangkat ESP32 milik pengguna.
 | `email` | `text` | Unique, email pengguna |
 | `password` | `text` | Password bcrypt-hashed |
 | `full_name` | `text` | Nama lengkap |
+| `mac_address` | `text` | Unique, nullable — MAC address perangkat ESP32 |
+| `device_name` | `text` | Nama/label perangkat (default `''`) |
 | `created_at` | `timestamptz` | Waktu pendaftaran |
 
 ### Tabel `slots`
@@ -638,15 +636,7 @@ Menghapus perangkat ESP32 milik pengguna.
 | `bot_response` | `text` | Respons dari chatbot |
 | `created_at` | `timestamptz` | Waktu pesan |
 
-### Tabel `devices`
-
-| Kolom | Tipe | Keterangan |
-|-------|------|------------|
-| `id` | `uuid` | Primary key |
-| `user_id` | `uuid` | Foreign key → `users.id` |
-| `mac_address` | `text` | MAC address unik perangkat ESP32 |
-| `device_name` | `text` | Nama/label perangkat |
-| `created_at` | `timestamptz` | Waktu pendaftaran |
+> **Catatan:** Tabel `devices` sudah tidak digunakan. MAC address dan device name sekarang disimpan langsung di tabel `users`.
 
 ---
 
