@@ -42,13 +42,12 @@ def delete_device(user_id: str):
         .execute()
 
 
-def get_device_by_mac(mac_address: str) -> dict | None:
-    mac_normalized = mac_address.upper().strip()
+def get_device_by_user_id(user_id: str) -> dict | None:
     response = supabase.table("users") \
         .select("id, mac_address, device_name, created_at") \
-        .eq("mac_address", mac_normalized) \
+        .eq("id", user_id) \
         .execute()
-    if response.data:
+    if response.data and response.data[0].get("mac_address"):
         device = response.data[0]
         device["user_id"] = device.pop("id")
         return device

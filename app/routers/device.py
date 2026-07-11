@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from app.services.device_service import get_device_by_mac, upsert_device, delete_device
+from app.services.device_service import get_device_by_user_id, upsert_device, delete_device
 
 router = APIRouter()
 
@@ -11,9 +11,9 @@ class UpsertDeviceRequest(BaseModel):
     user_id: str
 
 
-@router.get("/device/{mac_address}")
-async def get_user_device(mac_address: str):
-    device = get_device_by_mac(mac_address)
+@router.get("/device/{user_id}")
+async def get_user_device(user_id: str):
+    device = get_device_by_user_id(user_id)
     if not device:
         return {"device": None}
     return {"device": device}
@@ -25,9 +25,7 @@ async def register_or_update_device(request: UpsertDeviceRequest):
     return {"status": "ok", "device": device}
 
 
-@router.delete("/device/{mac_address}")
-async def remove_device(mac_address: str):
-    device = get_device_by_mac(mac_address)
-    if device:
-        delete_device(device["id"])
+@router.delete("/device/{user_id}")
+async def remove_device(user_id: str):
+    delete_device(user_id)
     return {"status": "ok"}

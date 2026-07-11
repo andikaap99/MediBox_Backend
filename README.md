@@ -516,21 +516,21 @@ Mengambil data profil pengguna berdasarkan ID.
 
 ---
 
-### 13. Get Device by MAC Address
+### 13. Get Device by User ID
 
-Mengambil data perangkat ESP32 berdasarkan MAC address. Berguna saat pengguna tidak mengetahui `user_id` tetapi mengetahui MAC address perangkatnya.
+Mengambil data perangkat ESP32 milik pengguna berdasarkan user ID.
 
 | | |
 |---|---|
 | **Method** | `GET` |
-| **Endpoint** | `/device/{mac_address}` |
+| **Endpoint** | `/device/{user_id}` |
 | **Auth** | Tidak* |
 
 **Path Parameter**
 
 | Field | Tipe | Wajib | Keterangan |
 |-------|------|-------|------------|
-| `mac_address` | `string` | Ya | MAC address perangkat ESP32 |
+| `user_id` | `string` | Ya | UUID pengguna |
 
 **Response `200 OK` (ada device)**
 
@@ -598,25 +598,25 @@ Mendaftarkan atau memperbarui perangkat ESP32 milik pengguna. MAC address disimp
 **Catatan:**
 - MAC address akan dinormalisasi ke huruf besar sebelum disimpan
 - Data device tersimpan langsung di tabel `users`, cukup update kolom `mac_address` dan `device_name`
-- `user_id` dapat diperoleh dari endpoint GET `/device/{mac_address}` atau dari response login
+- `user_id` dapat diperoleh dari response login
 
 ---
 
 ### 14. Delete Device
 
-Menghapus perangkat ESP32 milik pengguna berdasarkan MAC address.
+Menghapus perangkat ESP32 milik pengguna berdasarkan user ID.
 
 | | |
 |---|---|
 | **Method** | `DELETE` |
-| **Endpoint** | `/device/{mac_address}` |
+| **Endpoint** | `/device/{user_id}` |
 | **Auth** | Tidak* |
 
 **Path Parameter**
 
 | Field | Tipe | Wajib | Keterangan |
 |-------|------|-------|------------|
-| `mac_address` | `string` | Ya | MAC address perangkat ESP32 |
+| `user_id` | `string` | Ya | UUID pengguna |
 
 **Response `200 OK`**
 
