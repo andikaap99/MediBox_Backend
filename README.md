@@ -537,7 +537,7 @@ Mengambil data perangkat ESP32 berdasarkan MAC address. Berguna saat pengguna ti
 ```json
 {
   "device": {
-    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "user_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
     "mac_address": "AA:BB:CC:DD:EE:FF",
     "device_name": "MediBox Ruang Tamu",
     "created_at": "2026-07-10T12:00:00Z"

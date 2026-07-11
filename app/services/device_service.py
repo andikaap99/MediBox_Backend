@@ -49,7 +49,9 @@ def get_device_by_mac(mac_address: str) -> dict | None:
         .eq("mac_address", mac_normalized) \
         .execute()
     if response.data:
-        return response.data[0]
+        device = response.data[0]
+        device["user_id"] = device.pop("id")
+        return device
     return None
 
 
