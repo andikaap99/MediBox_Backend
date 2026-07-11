@@ -127,3 +127,19 @@ async def update_profile(user_id: str, request: UpdateProfileRequest):
         )
 
     return {"status": "ok", "updated": updated.data[0]}
+
+
+@router.get("/auth/profile/{user_id}")
+async def get_profile(user_id: str):
+    result = supabase.table("users") \
+        .select("id, email, full_name") \
+        .eq("id", user_id) \
+        .execute()
+
+    if not result.data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User tidak ditemukan"
+        )
+
+    return result.data[0]

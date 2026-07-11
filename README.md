@@ -480,7 +480,43 @@ Memperbarui data profil pengguna (nama, email, atau password).
 
 ---
 
-### 11. Get Device by MAC Address
+### 11. Get Profile
+
+Mengambil data profil pengguna berdasarkan ID.
+
+| | |
+|---|---|
+| **Method** | `GET` |
+| **Endpoint** | `/auth/profile/{user_id}` |
+| **Auth** | Tidak* |
+
+**Path Parameter**
+
+| Field | Tipe | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `user_id` | `string` | Ya | UUID pengguna |
+
+**Response `200 OK`**
+
+```json
+{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "email": "budi@example.com",
+  "full_name": "Budi Santoso"
+}
+```
+
+**Response `404 Not Found`**
+
+```json
+{
+  "detail": "User tidak ditemukan"
+}
+```
+
+---
+
+### 13. Get Device by MAC Address
 
 Mengambil data perangkat ESP32 berdasarkan MAC address. Berguna saat pengguna tidak mengetahui `user_id` tetapi mengetahui MAC address perangkatnya.
 
@@ -519,7 +555,7 @@ Mengambil data perangkat ESP32 berdasarkan MAC address. Berguna saat pengguna ti
 
 ---
 
-### 12. Register / Update Device
+### 13. Register / Update Device
 
 Mendaftarkan atau memperbarui perangkat ESP32 milik pengguna. MAC address disimpan langsung di tabel `users`, sehingga satu akun otomatis hanya bisa memiliki satu perangkat.
 
@@ -566,7 +602,7 @@ Mendaftarkan atau memperbarui perangkat ESP32 milik pengguna. MAC address disimp
 
 ---
 
-### 13. Delete Device
+### 14. Delete Device
 
 Menghapus perangkat ESP32 milik pengguna berdasarkan MAC address.
 
